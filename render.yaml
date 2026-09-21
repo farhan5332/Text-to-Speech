@@ -1,0 +1,33 @@
+# Render Blueprint for the speech API (https://render.com/docs/blueprint-spec).
+# Assumes this folder (the one holding package.json, src/ and server/) is the
+# root of the Git repository. If you push a parent folder instead, change
+# rootDir to the path of server/ from that root, e.g. client/server.
+services:
+  - type: web
+    name: speakeasy-api
+    runtime: node
+    plan: free
+    rootDir: server
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      # Render puts one proxy in front of the app; needed for per-user rate limits.
+      - key: TRUST_PROXY
+        value: "1"
+      # Your Vercel URL, e.g. https://speakeasy.vercel.app (comma-separate several).
+      # Left blank here so Render asks for it when the Blueprint is created.
+      - key: CORS_ORIGIN
+        sync: false
+      - key: RATE_LIMIT_WINDOW_MS
+        value: "60000"
+      - key: RATE_LIMIT_MAX
+        value: "20"
+      - key: MAX_TEXT_LENGTH
+        value: "5000"
+      - key: AUDIO_TTL_MINUTES
+        value: "30"

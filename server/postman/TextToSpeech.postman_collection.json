@@ -1,0 +1,163 @@
+{
+  "info": {
+    "name": "Text-to-Speech API",
+    "description": "Requests and checks for the SpeakEasy speech service. Set the `baseUrl` collection variable to your local server (http://localhost:5000) or your deployed Render URL, then use Run collection.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000" },
+    { "key": "audioUrl", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/health" },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));",
+              "pm.test('status is ok', () => pm.expect(pm.response.json().status).to.eql('ok'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "List voices",
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/voices" },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));",
+              "const { voices } = pm.response.json();",
+              "pm.test('returns voices', () => pm.expect(voices).to.be.an('array').that.is.not.empty);",
+              "pm.test('each voice has name, language, gender', () => voices.forEach(v => pm.expect(v).to.include.keys('name', 'language', 'gender')));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Generate speech",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/tts",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"text\": \"Hello, welcome to the Text-to-Speech application.\",\n  \"language\": \"en-US\",\n  \"voice\": \"Ava\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('201 Created', () => pm.response.to.have.status(201));",
+              "const body = pm.response.json();",
+              "pm.test('success with an audio URL', () => { pm.expect(body.success).to.be.true; pm.expect(body.audioUrl).to.match(/^\\/audio\\/.+\\.mp3$/); });",
+              "pm.collectionVariables.set('audioUrl', body.audioUrl);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Fetch generated clip",
+      "request": { "method": "GET", "url": "{{baseUrl}}{{audioUrl}}" },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));",
+              "pm.test('is MP3 audio', () => pm.expect(pm.response.headers.get('Content-Type')).to.include('audio/mpeg'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Errors",
+      "item": [
+        {
+          "name": "Empty text → 400",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/tts",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"text\": \"   \" }" }
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('400', () => pm.response.to.have.status(400));", "pm.test('has error message', () => pm.expect(pm.response.json().error).to.be.a('string'));"] } }]
+        },
+        {
+          "name": "Text over limit → 400",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/tts",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"text\": \"{{longText}}\" }" }
+          },
+          "event": [
+            { "listen": "prerequest", "script": { "exec": ["pm.variables.set('longText', 'a'.repeat(5001));"] } },
+            { "listen": "test", "script": { "exec": ["pm.test('400', () => pm.response.to.have.status(400));", "pm.test('mentions the limit', () => pm.expect(pm.response.json().error).to.include('5000'));"] } }
+          ]
+        },
+        {
+          "name": "Invalid language → 400",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/tts",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"text\": \"Hi\", \"language\": \"xx-XX\" }" }
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('400', () => pm.response.to.have.status(400));"] } }]
+        },
+        {
+          "name": "Voice from another language → 400",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/tts",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"text\": \"Hi\", \"language\": \"en-US\", \"voice\": \"Uzma\" }" }
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('400', () => pm.response.to.have.status(400));"] } }]
+        },
+        {
+          "name": "Malformed JSON → 400",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/tts",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"text\": \"Hi\"," }
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('400', () => pm.response.to.have.status(400));", "pm.test('readable message', () => pm.expect(pm.response.json().error).to.eql('The request body is not valid JSON.'));"] } }]
+        },
+        {
+          "name": "Wrong Content-Type → 415",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/tts",
+            "header": [{ "key": "Content-Type", "value": "text/plain" }],
+            "body": { "mode": "raw", "raw": "Hello" }
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('415', () => pm.response.to.have.status(415));"] } }]
+        },
+        {
+          "name": "Unknown route → 404",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/does-not-exist" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('404', () => pm.response.to.have.status(404));"] } }]
+        },
+        {
+          "name": "Expired clip → 404",
+          "request": { "method": "GET", "url": "{{baseUrl}}/audio/expired-clip.mp3" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('404', () => pm.response.to.have.status(404));"] } }]
+        }
+      ]
+    }
+  ]
+}

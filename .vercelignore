@@ -1,0 +1,2 @@
+# The API is deployed separately (Render); the static site does not need it.
+server/
