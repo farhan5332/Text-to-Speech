@@ -54,6 +54,25 @@ test('rejects a voice that belongs to a different language', () => {
   rejects({ text: 'Hi', language: 'en-US', voice: 'Uzma' }, /not a voice available for en-US/)
 })
 
+test('defaults rate and pitch to a neutral delivery', () => {
+  const result = validateSynthesisRequest({ text: 'Hi' })
+  assert.equal(result.rate, 1)
+  assert.equal(result.pitch, 0)
+})
+
+test('accepts rate and pitch inside their ranges', () => {
+  const result = validateSynthesisRequest({ text: 'Hi', rate: 1.5, pitch: -20 })
+  assert.equal(result.rate, 1.5)
+  assert.equal(result.pitch, -20)
+})
+
+test('rejects rate and pitch outside their ranges or of the wrong type', () => {
+  rejects({ text: 'Hi', rate: 3 }, /"rate" must be/)
+  rejects({ text: 'Hi', rate: '1.2' }, /"rate" must be/)
+  rejects({ text: 'Hi', pitch: 80 }, /"pitch" must be/)
+  rejects({ text: 'Hi', pitch: Number.NaN }, /"pitch" must be/)
+})
+
 test('provider timeouts become 504', () => {
   const error = toRequestError(Object.assign(new Error('timeout'), { code: 'ETIMEDOUT' }))
   assert.equal(error.status, 504)

@@ -46,8 +46,8 @@ export async function fetchVoices() {
 /* ── Generate ───────────────────────────────────────── */
 
 // POST /api/tts -> the full result object
-export async function generateSpeech({ text, language, voice }) {
-  const { data } = await api.post('/api/tts', { text, language, voice });
+export async function generateSpeech({ text, language, voice, rate, pitch }) {
+  const { data } = await api.post('/api/tts', { text, language, voice, rate, pitch });
   return { ...data, audioUrl: `${API_URL}${data.audioUrl}` };
 }
 
@@ -65,7 +65,8 @@ export async function checkHealth() {
 
 /* ── Browser speech (fallback for VITE_USE_BACKEND=false) ── */
 
-export function speak({ text, voice, volume = 1, rate = 1, onEnd }) {
+// pitch is the same relative percentage the API takes (-50..50).
+export function speak({ text, voice, volume = 1, rate = 1, pitch = 0, onEnd }) {
   const synth = window.speechSynthesis;
   if (!synth) return;
   synth.cancel();
@@ -76,6 +77,7 @@ export function speak({ text, voice, volume = 1, rate = 1, onEnd }) {
   }
   u.volume = volume;
   u.rate = rate;
+  u.pitch = 1 + pitch / 100;
   if (onEnd) u.onend = onEnd;
   synth.speak(u);
 }

@@ -1,16 +1,11 @@
+import Icon from './Icon';
+
 export default function ErrorMessage({ message, onRetry }) {
   if (!message) return null;
 
   return (
     <div className="error" role="alert">
-      <svg
-        width="16" height="16" viewBox="0 0 24 24" fill="none"
-        stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"
-        aria-hidden="true"
-      >
-        <circle cx="12" cy="12" r="9" />
-        <path d="M12 7.5v5.5M12 16.2v.2" />
-      </svg>
+      <Icon name="alert" size={16} strokeWidth={2.2} />
       <span>{message}</span>
       {onRetry && (
         <button type="button" className="error-retry" onClick={onRetry}>

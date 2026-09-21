@@ -2,6 +2,7 @@ export const LANGUAGES = [
   {
     code: 'en-US',
     label: 'English (US)',
+    native: 'English',
     voices: [
       { id: 'ava', label: 'Ava', gender: 'Female' },
       { id: 'ryan', label: 'Ryan', gender: 'Male' },
@@ -11,6 +12,7 @@ export const LANGUAGES = [
   {
     code: 'en-GB',
     label: 'English (UK)',
+    native: 'English',
     voices: [
       { id: 'sonia', label: 'Sonia', gender: 'Female' },
       { id: 'thomas', label: 'Thomas', gender: 'Male' },
@@ -19,6 +21,7 @@ export const LANGUAGES = [
   {
     code: 'es-ES',
     label: 'Spanish (Spain)',
+    native: 'Español',
     voices: [
       { id: 'elvira', label: 'Elvira', gender: 'Female' },
       { id: 'alvaro', label: 'Álvaro', gender: 'Male' },
@@ -27,6 +30,7 @@ export const LANGUAGES = [
   {
     code: 'fr-FR',
     label: 'French',
+    native: 'Français',
     voices: [
       { id: 'denise', label: 'Denise', gender: 'Female' },
       { id: 'henri', label: 'Henri', gender: 'Male' },
@@ -35,6 +39,7 @@ export const LANGUAGES = [
   {
     code: 'de-DE',
     label: 'German',
+    native: 'Deutsch',
     voices: [
       { id: 'katja', label: 'Katja', gender: 'Female' },
       { id: 'conrad', label: 'Conrad', gender: 'Male' },
@@ -43,6 +48,7 @@ export const LANGUAGES = [
   {
     code: 'hi-IN',
     label: 'Hindi',
+    native: 'हिन्दी',
     voices: [
       { id: 'swara', label: 'Swara', gender: 'Female' },
       { id: 'madhur', label: 'Madhur', gender: 'Male' },
@@ -51,6 +57,7 @@ export const LANGUAGES = [
   {
     code: 'ur-PK',
     label: 'Urdu',
+    native: 'اردو',
     voices: [
       { id: 'uzma', label: 'Uzma', gender: 'Female' },
       { id: 'asad', label: 'Asad', gender: 'Male' },
@@ -59,6 +66,7 @@ export const LANGUAGES = [
   {
     code: 'ar-SA',
     label: 'Arabic',
+    native: 'العربية',
     voices: [
       { id: 'zariyah', label: 'Zariyah', gender: 'Female' },
       { id: 'hamed', label: 'Hamed', gender: 'Male' },
@@ -67,6 +75,7 @@ export const LANGUAGES = [
   {
     code: 'ja-JP',
     label: 'Japanese',
+    native: '日本語',
     voices: [
       { id: 'nanami', label: 'Nanami', gender: 'Female' },
       { id: 'keita', label: 'Keita', gender: 'Male' },

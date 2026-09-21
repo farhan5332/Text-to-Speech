@@ -57,7 +57,21 @@ function validateSynthesisRequest(body) {
     voice: voice.name,
     gender: voice.gender,
     edgeVoice: voice.edge,
+    rate: optionalNumber(body.rate, 'rate', RATE_RANGE, 1),
+    pitch: optionalNumber(body.pitch, 'pitch', PITCH_RANGE, 0),
   }
+}
+
+// Speaking rate is a multiplier (1 = normal); pitch is a relative percentage.
+const RATE_RANGE = [0.5, 2]
+const PITCH_RANGE = [-50, 50]
+
+function optionalNumber(value, field, [min, max], fallback) {
+  if (value === undefined || value === null) return fallback
+  if (typeof value !== 'number' || !Number.isFinite(value) || value < min || value > max) {
+    throw new RequestError(400, `"${field}" must be a number from ${min} to ${max}.`)
+  }
+  return value
 }
 
 /** Spec §13: reject bodies that are not JSON before anything else reads them. */

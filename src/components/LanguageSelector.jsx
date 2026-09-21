@@ -1,29 +1,26 @@
+import Icon from './Icon';
 import { LANGUAGES } from '../constants/languages';
 
+const optionLabel = (lang) =>
+  lang.native && !lang.label.startsWith(lang.native) ? `${lang.label} (${lang.native})` : lang.label;
+
 export default function LanguageSelector({ value, onChange }) {
+  const translates = !value.startsWith('en');
+
   return (
-    <div>
+    <div className="field">
       <div className="label-row">
-        <label className="field-label" htmlFor="tts-lang">
-          Language
-        </label>
+        <label className="field-label" htmlFor="tts-lang">Language &amp; accent</label>
+        {translates && <span className="field-hint">Auto-translate on</span>}
       </div>
       <div className="select-shell">
-        <svg className="select-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-             strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" />
-        </svg>
-        <select
-          id="tts-lang"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-        >
+        <Icon name="globe" size={18} className="select-icon" />
+        <select id="tts-lang" value={value} onChange={(e) => onChange(e.target.value)}>
           {LANGUAGES.map((lang) => (
-            <option key={lang.code} value={lang.code}>
-              {lang.label}
-            </option>
+            <option key={lang.code} value={lang.code}>{optionLabel(lang)}</option>
           ))}
         </select>
+        <Icon name="chevron" size={18} className="select-chevron" />
       </div>
     </div>
   );

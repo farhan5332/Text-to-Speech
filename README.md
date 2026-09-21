@@ -65,6 +65,7 @@ npm run dev                 # http://localhost:5173
 |---|---|---|
 | API tests | `cd server && npm test` | validation, every status code (200/201/400/403/404/413/415/429/500/503/504), CORS, security headers. The speech provider is faked, so no network is needed. |
 | Client tests | `npm test` | text validation, error-message mapping (timeout, offline, unreachable, each status), and that client and server agree on languages and the length limit |
+| UI tests | `npm test` (`src/pages/Home.test.jsx`) | the page in jsdom with the API faked: empty and over-limit input, language and voice selection, loading state, error display and retry, audio playback and history, and download |
 | Live smoke test | `cd server; powershell -ExecutionPolicy Bypass -File .\test-api.ps1` (with the server running) | the real server and real provider, end to end, including fetching the generated MP3 |
 | Postman | import `server/postman/TextToSpeech.postman_collection.json`, set `baseUrl`, then **Run collection** | every endpoint and error case, with assertions |
 

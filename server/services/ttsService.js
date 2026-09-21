@@ -17,17 +17,20 @@ function escapeXml(text) {
 }
 
 /**
- * @param {{ text: string, edgeVoice: string }} request
+ * @param {{ text: string, edgeVoice: string, rate?: number, pitch?: number }} request
  * @returns {Promise<Buffer>} MP3 bytes
  */
-async function synthesizeToBuffer({ text, edgeVoice }) {
+async function synthesizeToBuffer({ text, edgeVoice, rate = 1, pitch = 0 }) {
   // A connection is bound to one voice, so each request opens its own.
   const tts = new MsEdgeTTS()
   let timer
 
   try {
     await tts.setMetadata(edgeVoice, OUTPUT_FORMAT.AUDIO_24KHZ_48KBITRATE_MONO_MP3)
-    const { audioStream } = tts.toStream(escapeXml(text))
+    const { audioStream } = tts.toStream(escapeXml(text), {
+      rate,
+      pitch: `${pitch >= 0 ? '+' : ''}${pitch}%`,
+    })
 
     const audio = await new Promise((resolve, reject) => {
       const chunks = []
